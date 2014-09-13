@@ -33,8 +33,11 @@ fn main() {
         data: None
     };
 
-    conn.execute("INSERT INTO person (name, created, data) VALUES ($1, $2, $3);",
+    let trans = conn.transaction().unwrap();
+    trans.execute("INSERT INTO person (name, created, data) VALUES ($1, $2, $3);", 
         &[&person.name, &person.created, &person.data]).unwrap();
+    trans.set_commit();
+    trans.finish().unwrap();
 
     let stmt = conn.prepare("SELECT id, name, created, data FROM person;").unwrap();
 
