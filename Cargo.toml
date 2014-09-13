@@ -1,0 +1,9 @@
+[package]
+
+name = "rusty"
+version = "0.0.1"
+authors = ["superlogical <jake.net@gmail.com>"]
+
+[dependencies.postgres]
+
+git = "https://github.com/sfackler/rust-postgres.git"
