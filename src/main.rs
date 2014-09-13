@@ -18,10 +18,13 @@ struct Person {
 }
 
 fn main() {
+
+    // connect to postgres
     let conn = PostgresConnection::connect("postgres://postgres:swine@localhost/rusty", &NoSsl).unwrap();
     
+    // ddl statements
     conn.execute("DROP TABLE IF EXISTS person;", []).unwrap();
-
+    
     conn.execute(       
         "CREATE TABLE IF NOT EXISTS person (
             id          SERIAL PRIMARY KEY,
@@ -31,23 +34,20 @@ fn main() {
             json        JSON
         );", []).unwrap();
 
-    let json = json::from_str(r#"{"city": "London", "lat": 51.507222, "lon": -0.1275}"#).unwrap();
     
-    println!("{}", json);
+    
+    // insert example
+    println!("inserting");
 
     let person = Person {
         id: 0,
         name: "Jake Scott".to_string(),
         created: time::get_time(),
         data: Some(vec!(1, 2, 3)),
-        json: Some(json),
+        json: Some(json::from_str(r#"{"city": "London", "lat": 51.507222, "lon": -0.1275}"#).unwrap()),
     };
 
-    println!("beginning insert");
-
-    let trans = conn.transaction().unwrap();
-    
-    trans.execute(
+    conn.execute(
         "INSERT INTO person (
             name, 
             created, 
@@ -61,12 +61,42 @@ fn main() {
             &person.json,
         ]
     ).unwrap();
-    
+
+
+    // create another person
+    let person2 = Person {
+        id: 0,
+        name: "John John Florence".to_string(),
+        created: time::get_time(),
+        data: Some(vec!(1, 2, 3)),
+        json: Some(json::from_str(r#"{"city": "Hawaii", "lat": 21.3114, "lon": 157.7964}"#).unwrap()),
+    };    
+
+
+    // transaction example
+    println("inserting using transaction");
+
+    let trans = conn.transaction().unwrap();
+    trans.execute(
+        "INSERT INTO person (
+            name, 
+            created, 
+            data, 
+            json
+        ) VALUES ($1, $2, $3, $4);", 
+        &[
+            &person2.name, 
+            &person2.created, 
+            &person2.data,
+            &person2.json,
+        ]
+    ).unwrap();    
     trans.set_commit();
-    
     trans.finish().unwrap();
 
-    println!("inserted");
+    
+    // query
+    println!("querying");
 
     let stmt = conn.prepare("SELECT id, name, created, data, json FROM person;").unwrap();
 
