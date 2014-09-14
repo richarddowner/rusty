@@ -1,3 +1,4 @@
+use serialize::json;
 use nickel::{Request, Response};
 use models::{ Practice, PracticeForm };
 
@@ -10,18 +11,29 @@ pub fn get_healthcheck (_request: &Request, response: &mut Response) {
 }
 
 pub fn post_practice (request: &Request, response: &mut Response) {
+    response.set_content_type("application/json");
+    
     let form = request.json_as::<PracticeForm>().unwrap();
     
+    let name:String;    
+    match form.name {
+        Some(n) => { name = n; },
+        None => {
+            response.send(r#"{ "error": "name is required" }"#);
+            return
+        }
+    };
+
     let mut practice = Practice{
-    	id: 0,
-    	name: form.name,
-    	display_name: form.display_name,
-    	logo_document_id: form.logo_document_id,
-    	avatar_document_id: form.avatar_document_id,
+        id: 0,
+        name: name,
+        display_name: form.display_name,
+        logo_document_id: form.logo_document_id,
+        avatar_document_id: form.avatar_document_id,
     };
 
     Practice::insert(&mut practice);
-
-    let text = format!("{}", practice);
+    
+    let text = json::encode(&practice);
     response.send(text.as_slice());
 }

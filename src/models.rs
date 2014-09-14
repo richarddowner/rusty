@@ -22,7 +22,7 @@ pub struct Practice {
 #[deriving(Show)]
 #[deriving(Encodable, Decodable)]
 pub struct PracticeForm {
-    pub name: String,
+    pub name: Option<String>,
     pub display_name: Option<String>,
     pub logo_document_id: Option<String>,
     pub avatar_document_id: Option<String>,
@@ -55,7 +55,7 @@ impl Practice {
             let id = row.get(0u);
             practice.id = id;
             break;
-        }        
+        }
     }
 
     pub fn seed_database () {
@@ -92,7 +92,7 @@ impl Practice {
                 name: row.get(1u),
                 display_name: row.get(2u),
                 logo_document_id: row.get(3u),
-                avatar_document_id: row.get(4u),                
+                avatar_document_id: row.get(4u),
             };
             println!("Found pracice {}", p);
         }

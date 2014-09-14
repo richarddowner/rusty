@@ -35,6 +35,7 @@ fn main() {
 
     // middleware
     server.utilize(Nickel::json_body_parser());
+    server.utilize(Nickel::query_string());
     server.utilize(router);
 
     // start server
