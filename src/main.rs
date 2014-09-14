@@ -8,7 +8,7 @@ use serialize::json;
 use postgres::{PostgresConnection, NoSsl};
 use nickel::{Nickel, Request, Response};
 
-use models::{ Practice, Person };
+use models::{ Practice };
 use database::{ Database };
 
 mod models;
@@ -26,13 +26,10 @@ fn main() {
 
     // create database
     let database = Database::new();
-    database.create();
-
-    // insert a dummy person into the database
-    Person::seed_database();
-    Person::query_example();
+    database.create();    
 
     Practice::seed_database();
+    Practice::query_example();
 
     // create a new web server
     let mut server = Nickel::new();

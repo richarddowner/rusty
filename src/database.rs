@@ -16,20 +16,7 @@ impl Database {
 
     pub fn create (&self) {
         let conn = self.connect();
-        
-        conn.execute("DROP TABLE IF EXISTS person;", []).unwrap();
-        
-        conn.execute(       
-            "CREATE TABLE IF NOT EXISTS person (
-                id          SERIAL PRIMARY KEY,
-                name        VARCHAR NOT NULL,
-                created     TIMESTAMP NOT NULL,
-                data        BYTEA,
-                json        JSON
-            );", []).unwrap();
-
-        conn.execute("DROP TABLE IF EXISTS practice;", []).unwrap();
-        
+        conn.execute("DROP TABLE IF EXISTS practice;", []).unwrap();        
         conn.execute(       
             "CREATE TABLE IF NOT EXISTS practice (
                 id                  SERIAL PRIMARY KEY,
