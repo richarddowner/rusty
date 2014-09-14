@@ -1,13 +1,15 @@
 extern crate postgres;
 extern crate time;
 extern crate serialize;
+extern crate nickel;
 
+use std::io::net::ip::Ipv4Addr;
 use time::Timespec;
 use serialize::json;
 use serialize::json::Json;
-
 use postgres::{PostgresConnection, NoSsl};
 use postgres::types::ToSql;
+use nickel::{Nickel, Request, Response};
 
 struct Person {
     id: i32,
@@ -74,7 +76,7 @@ fn main() {
 
 
     // transaction example
-    println("inserting using transaction");
+    println!("inserting using transaction");
 
     let trans = conn.transaction().unwrap();
     trans.execute(
@@ -112,4 +114,15 @@ fn main() {
 
         println!("Found person {}", p.name);
     }
+
+    // start web server
+    fn home_handler (_request: &Request, response: &mut Response) {
+        response.send("hai");
+    }
+
+    let mut server = Nickel::new();
+    server.get("/", home_handler);
+    server.listen(Ipv4Addr(127, 0, 0, 1), 3000);
+
+    println!("Nickel http://127.0.0.1:3000");
 }
