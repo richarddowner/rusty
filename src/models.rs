@@ -7,6 +7,7 @@ use serialize::json;
 use serialize::json::Json;
 
 use database::{ Database };
+use postgres::types::ToSql;
 
 #[deriving(Show)]
 #[deriving(Encodable, Decodable)]
@@ -28,8 +29,36 @@ pub struct PracticeForm {
 }
 
 impl Practice {
-    pub fn seed_database () {
 
+    pub fn insert(practice: &mut Practice) {
+        let conn = Database::new().connect();        
+        let stmt = conn.prepare(
+            "INSERT INTO practice (
+                name, 
+                display_name, 
+                logo_document_id, 
+                avatar_document_id
+            ) 
+            VALUES (
+                $1, $2, $3, $4
+            )
+            RETURNING id;").unwrap();
+
+        let params: &[&ToSql] = &[
+            &practice.name,
+            &practice.display_name,
+            &practice.logo_document_id,
+            &practice.avatar_document_id,
+        ];
+
+        for row in stmt.query(params).unwrap() {
+            let id = row.get(0u);
+            practice.id = id;
+            break;
+        }        
+    }
+
+    pub fn seed_database () {
         let practice = Practice {
             id: 0,
             name: "Pacific Bay Associates (Ltd)".to_string(),
@@ -37,9 +66,7 @@ impl Practice {
             logo_document_id: Some("01234567-89ab-cdef-0123-456789abcdef".to_string()),
             avatar_document_id: Some("01234567-89ab-cdef-0123-456789abcdef".to_string()),            
         };
-
         let conn = Database::new().connect();
-
         conn.execute(
             "INSERT INTO practice (
                 name, 
@@ -53,7 +80,7 @@ impl Practice {
                 &practice.logo_document_id,
                 &practice.avatar_document_id,
             ]
-        ).unwrap();     
+        ).unwrap();
     }
 
     pub fn query_example () {
