@@ -9,12 +9,22 @@ use serialize::json::Json;
 use database::{ Database };
 
 #[deriving(Show)]
+#[deriving(Encodable, Decodable)]
 pub struct Practice {
     pub id: i32,
     pub name: String,
-    pub display_name: String,
-    pub logo_document_id: String,
-    pub avatar_document_id: String,    
+    pub display_name: Option<String>,
+    pub logo_document_id: Option<String>,
+    pub avatar_document_id: Option<String>,
+}
+
+#[deriving(Show)]
+#[deriving(Encodable, Decodable)]
+pub struct PracticeForm {
+    pub name: String,
+    pub display_name: Option<String>,
+    pub logo_document_id: Option<String>,
+    pub avatar_document_id: Option<String>,
 }
 
 impl Practice {
@@ -23,9 +33,9 @@ impl Practice {
         let practice = Practice {
             id: 0,
             name: "Pacific Bay Associates (Ltd)".to_string(),
-            display_name: "Pacific Bay Associates".to_string(),
-            logo_document_id: "01234567-89ab-cdef-0123-456789abcdef".to_string(),
-            avatar_document_id: "01234567-89ab-cdef-0123-456789abcdef".to_string(),         
+            display_name: Some("Pacific Bay Associates".to_string()),
+            logo_document_id: Some("01234567-89ab-cdef-0123-456789abcdef".to_string()),
+            avatar_document_id: Some("01234567-89ab-cdef-0123-456789abcdef".to_string()),            
         };
 
         let conn = Database::new().connect();

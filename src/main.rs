@@ -13,14 +13,7 @@ use database::{ Database };
 
 mod models;
 mod database;
-
-#[deriving(Decodable, Encodable)]
-pub struct PersonForm {
-    pub name: String,
-    pub display_name: String,
-    pub age: Option<u8>,
-    pub data: Option<Vec<u8>>,
-}
+mod controllers;
 
 fn main() {    
 
@@ -36,8 +29,9 @@ fn main() {
     let mut router = Nickel::router();
 
     // routes
-    router.get("/", home_handler);
-    router.post("/person", create_person_handler);
+    router.get("/",             controllers::get_home);
+    router.get("/healthcheck",  controllers::get_healthcheck);
+    router.post("/practice",    controllers::post_practice);
 
     // middleware
     server.utilize(Nickel::json_body_parser());
@@ -45,26 +39,4 @@ fn main() {
 
     // start server
     server.listen(Ipv4Addr(127, 0, 0, 1), 3000);
-}
-
-fn home_handler (_request: &Request, response: &mut Response) {
-    response.send("hai");
-}
-
-fn create_person_handler (request: &Request, response: &mut Response) {
-    let person = request.json_as::<PersonForm>().unwrap();
-
-    let numbers = match person.data {
-        Some(x) => format!("Got some numbers: {}", x).to_string(),
-        None => "None".to_string()
-    };
-
-    let age = match person.age {
-        Some(x) => if x >= 30 { "You are old!".to_string() } else { "You are young!".to_string() },
-        None => "".to_string()
-    };
-
-    let text = format!("name: {}, display name: {}, age: {}, numbers: {}", person.name, person.display_name, age, numbers);
-    
-    response.send(text.as_slice());
 }
