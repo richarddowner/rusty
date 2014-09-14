@@ -8,11 +8,19 @@ use serialize::json;
 use postgres::{PostgresConnection, NoSsl};
 use nickel::{Nickel, Request, Response};
 
-use models::{ Person, PersonForm };
+use models::{ Practice, Person };
 use database::{ Database };
 
 mod models;
 mod database;
+
+#[deriving(Decodable, Encodable)]
+pub struct PersonForm {
+    pub name: String,
+    pub display_name: String,
+    pub age: Option<u8>,
+    pub data: Option<Vec<u8>>,
+}
 
 fn main() {    
 
@@ -23,6 +31,8 @@ fn main() {
     // insert a dummy person into the database
     Person::seed_database();
     Person::query_example();
+
+    Practice::seed_database();
 
     // create a new web server
     let mut server = Nickel::new();
