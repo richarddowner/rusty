@@ -1,6 +1,6 @@
 ##rusty
 
-Trying out the following crates
+Learning Rust by building a web api using Postgresql and Nickle.rs
 
 ##rust-postgres
 https://github.com/sfackler/rust-postgres/
