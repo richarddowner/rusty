@@ -21,8 +21,7 @@ fn main() {
     let database = Database::new();
     database.create();    
 
-    Practice::seed_database();
-    Practice::query_example();
+    Practice::seed_database();    
 
     // create a new web server
     let mut server = Nickel::new();
@@ -31,6 +30,7 @@ fn main() {
     // routes
     router.get("/",             controllers::get_home);
     router.get("/healthcheck",  controllers::get_healthcheck);
+    router.get("/practice",     controllers::get_practices);
     router.post("/practice",    controllers::post_practice);
 
     // middleware

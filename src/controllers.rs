@@ -34,6 +34,13 @@ pub fn post_practice (request: &Request, response: &mut Response) {
 
     Practice::insert(&mut practice);
     
-    let text = json::encode(&practice);
-    response.send(text.as_slice());
+    let json = json::encode(&practice);
+    response.send(json.as_slice());
+}
+
+pub fn get_practices (request: &Request, response: &mut Response) {
+    response.set_content_type("application/json");
+    let practices = Practice::all();
+    let json = json::encode(&practices);
+    response.send(json.as_slice());
 }

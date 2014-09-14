@@ -83,18 +83,20 @@ impl Practice {
         ).unwrap();
     }
 
-    pub fn query_example () {
+    pub fn all () -> Vec<Practice> {
+        let mut practices: Vec<Practice> = Vec::new();
         let conn = Database::new().connect();
         let stmt = conn.prepare("SELECT id, name, display_name, logo_document_id, avatar_document_id FROM practice;").unwrap();
-        for row in stmt.query([]).unwrap() {            
-            let p = Practice {
+        for row in stmt.query([]).unwrap() {
+            let practice = Practice {
                 id: row.get(0u),
                 name: row.get(1u),
                 display_name: row.get(2u),
                 logo_document_id: row.get(3u),
                 avatar_document_id: row.get(4u),
             };
-            println!("Found pracice {}", p);
+            practices.push(practice);
         }
+        practices
     }
 }
