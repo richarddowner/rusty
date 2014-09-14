@@ -144,7 +144,6 @@ fn home_handler (_request: &Request, response: &mut Response) {
 }
 
 fn create_person_handler (request: &Request, response: &mut Response) {
-    
     let person = request.json_as::<PersonForm>().unwrap();
 
     let numbers = match person.data {
@@ -157,7 +156,6 @@ fn create_person_handler (request: &Request, response: &mut Response) {
         None => "".to_string()
     };
 
-    let text = format!("name: {}, display name: {}, age: {}, numbers: {}", person.name, person.display_name, age, numbers);
-    
+    let text = format!("name: {}, display name: {}, age: {}, numbers: {}", person.name, person.display_name, age, numbers);    
     response.send(text.as_slice());
 }
