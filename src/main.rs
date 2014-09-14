@@ -19,6 +19,14 @@ struct Person {
     json: Option<Json>,
 }
 
+#[deriving(Decodable, Encodable)]
+struct PersonForm {
+    name: String,
+    display_name: String,
+    age: Option<u8>,
+    data: Option<Vec<u8>>,
+}
+
 fn main() {
 
     // connect to postgres
@@ -115,14 +123,41 @@ fn main() {
         println!("Found person {}", p.name);
     }
 
-    // start web server
-    fn home_handler (_request: &Request, response: &mut Response) {
-        response.send("hai");
-    }
-
+    // create a new web server
     let mut server = Nickel::new();
-    server.get("/", home_handler);
-    server.listen(Ipv4Addr(127, 0, 0, 1), 3000);
+    let mut router = Nickel::router();
 
-    println!("Nickel http://127.0.0.1:3000");
+    // routes
+    router.get("/", home_handler);
+    router.post("/person", create_person_handler);
+
+    // middleware
+    server.utilize(Nickel::json_body_parser());
+    server.utilize(router);
+
+    // start server
+    server.listen(Ipv4Addr(127, 0, 0, 1), 3000);
+}
+
+fn home_handler (_request: &Request, response: &mut Response) {
+    response.send("hai");
+}
+
+fn create_person_handler (request: &Request, response: &mut Response) {
+    
+    let person = request.json_as::<PersonForm>().unwrap();
+
+    let numbers = match person.data {
+        Some(x) => format!("Got some numbers: {}", x).to_string(),
+        None => "None".to_string()
+    };
+
+    let age = match person.age {
+        Some(x) => if x >= 30 { "You are old!".to_string() } else { "You are young!".to_string() },
+        None => "".to_string()
+    };
+
+    let text = format!("name: {}, display name: {}, age: {}, numbers: {}", person.name, person.display_name, age, numbers);
+    
+    response.send(text.as_slice());
 }
