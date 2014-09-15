@@ -15,26 +15,21 @@ use lmdb::base::{Environment};
 
 use models::{ Practice };
 use database::{ Database };
+use cache::{ Cache };
 
 mod models;
 mod database;
 mod controllers;
+mod cache;
 
 fn main() {    
 
-    let path = Path::new("./dbs");
-    let display = path.display();
-    if path.exists() {
-        println!("{} exists", display);
-        fs::rmdir_recursive(&path);
-    }    
-    let mut env = Environment::new().unwrap();
-    env.set_maxdbs(5);
-    env.open(&path, 0, 0o755);
-    env.get_or_create_db("test-db", 0);
+    // create lmdb based cache
+    let cache: Cache = Cache::new();
 
-    println!("Lighting bolts!");
-
+    cache.set("/practice", r#" { "name" : "Superlogical", "display_name": "Bob" } "#);
+    let value:String = cache.get("/practice");
+    println!("got {}", value);
 
     // create database
     let database = Database::new();
